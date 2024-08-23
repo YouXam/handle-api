@@ -59,6 +59,7 @@ watchEffect(() => {
 <template>
   <div>
     <div flex="~ col" pt4 items-center>
+      <Hint />
       <div id="words" p4>
         <div id="wordsDisplay">
           <WordBlocks v-for="w, i of tries" :key="i" :word="w" :revealed="true" :animate="false" @click="focus()" />

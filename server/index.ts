@@ -51,7 +51,9 @@ export class IdiObject {
 		if (!this.browser || !this.browser.connected) {
             console.log(`Browser: Starting new instance`);
             try {
-                this.browser = await puppeteer.launch();
+                this.browser = await puppeteer.launch({
+                    protocolTimeout: 10000,
+                });
             } catch (e) {
                 console.log(
                     `Browser: Could not start browser instance. Error: ${e}`,
@@ -104,13 +106,13 @@ export class IdiObject {
 		return { page: data.page, data }
 	}
 
-	async image(session: string) {
+	async image(session: string, selector: string='#words') {
 		await this.ensureBrowser()
 		const { page } = await this.findPage(session) || {}
 		if (!page) {
 			return new Response("Session not found", { status: 404 })
 		}
-		const element = await page.$('#words');
+		const element = await page.$(selector);
 		if (element) {
 			const sc = await element.screenshot();
 			return new Response(sc, {
@@ -157,9 +159,14 @@ export class IdiObject {
 			}
 		}
 		if (data.guesses.length >= data.limit) {
-            await this.sessions.delete(session)
-            await page.close()
-			return { success: false, error: "尝试次数已用完", code: 400 }
+			return {
+                success: false,
+                explanation: await getExplanation(data.idiom),
+                idiom: data.idiom,
+                code: 400,
+                attemptedTimes: data.guesses.length,
+                remainingAttempts: 0
+            }
 		}
 		return {
             success: false,
@@ -213,6 +220,18 @@ const hono = new Hono()
             remainingAttempts: data.limit - data.guesses.length,
             attemptedTimes: data.guesses.length
         })
+    })
+    .get("/hint/:session/:level", async c => {
+        const session = c.req.param('session')
+        const level = c.req.param('level')
+        if (level !== '1' && level !== '2') {
+            return c.json({ error: "Invalid level", code: 400 }, 400)
+        }
+        const { data } = await idiObject.findPage(session) || {}
+        if (!data) {
+            return c.json({ error: "Session not found", code: 404 }, 404)
+        }
+        return await idiObject.image(session, level === '1' ? '#hint-1' : '#hint-2')
     })
 
 export default {

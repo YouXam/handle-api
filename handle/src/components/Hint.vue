@@ -11,12 +11,12 @@ const masked = computed(() => ({
 
 <template>
   <div>
-    <div p8 flex="~ col gap-4" items-center>
+    <div id="hint-1" p8 flex="~ col gap-4" items-center>
       <div>{{ t('hint-note') }} <b>{{ t('ziyin') }}</b></div>
       <CharBlock :char="masked" />
     </div>
     <hr>
-    <div p8 flex="~ col gap-4" items-center>
+    <div id="hint-2" p8 flex="~ col gap-4" items-center>
       <div>{{ t('hint-note') }} <b>{{ t('hanzi') }}</b></div>
       <CharBlock :char="parsed" />
     </div>

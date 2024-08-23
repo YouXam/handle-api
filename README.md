@@ -113,3 +113,9 @@
         "attemptedTimes": 2
     }
     ```
+
+5. `GET /hint/:session/:level`
+    获取提示图片，`level` 可取 1（某个字的字音）, 2（某个字）。
+
+    **响应体**
+    返回图片文件。
