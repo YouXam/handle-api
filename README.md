@@ -99,3 +99,17 @@
 
     **响应体**
     返回图片文件。
+4. `GET /stat/:session`
+    获取游戏信息。
+
+    **响应体**
+    ```json5
+    {
+        "guesses": [
+            "临渊羡鱼",
+            "事倍功半"
+        ],
+        "remainingAttempts": 4,
+        "attemptedTimes": 2
+    }
+    ```
