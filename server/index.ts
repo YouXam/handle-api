@@ -52,7 +52,7 @@ export class IdiObject {
             console.log(`Browser: Starting new instance`);
             try {
                 this.browser = await puppeteer.launch({
-                    protocolTimeout: 10000,
+                    protocolTimeout: 20000,
                     args: ['--no-sandbox']
                 });
             } catch (e) {
@@ -115,6 +115,7 @@ export class IdiObject {
 		}
 		const element = await page.$(selector);
 		if (element) {
+            await page.bringToFront();
 			const sc = await element.screenshot();
 			return new Response(sc, {
 				headers: {
