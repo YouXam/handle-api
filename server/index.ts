@@ -53,6 +53,7 @@ export class IdiObject {
             try {
                 this.browser = await puppeteer.launch({
                     protocolTimeout: 10000,
+                    args: ['--no-sandbox']
                 });
             } catch (e) {
                 console.log(
