@@ -63,6 +63,7 @@ export class IdiObject {
 	async newPage(idiom: string, mode: z.infer<typeof newSchema>['mode'], limit: z.infer<typeof newSchema>['limit'], uuid: string) {
 		await this.ensureBrowser()
 		const page = await this.browser!.newPage()
+        await page.setViewport({width: 800, height: 800, deviceScaleFactor: 2});
 		await page.goto("https://handle-cvp.pages.dev/?" + new URLSearchParams({
 			mode,
 			limit: limit.toString(),
@@ -201,7 +202,18 @@ const hono = new Hono()
 	.get("/image/:session", async c => {
 		const res = await idiObject.image(c.req.param('session'))
 		return res
-	});
+	})
+    .get("/stat/:session", async c => {
+        const { data } = await idiObject.findPage(c.req.param('session')) || {}
+        if (!data) {
+            return c.json({ error: "Session not found", code: 404 }, 404)
+        }
+        return c.json({
+            guesses: data.guesses,
+            remainingAttempts: data.limit - data.guesses.length,
+            attemptedTimes: data.guesses.length
+        })
+    })
 
 export default {
     hostname: Bun.env.HOSTNAME || 'localhost',
